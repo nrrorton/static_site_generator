@@ -57,6 +57,3 @@ def block_to_block_type(block_text):
     return BlockType.PARAGRAPH
 
 
-block_text = "```This is code'''"
-block_type = block_to_block_type(block_text)
-print(block_type)
