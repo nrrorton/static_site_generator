@@ -183,3 +183,34 @@ the **same** even with inline stuff
             html,
             "<div><pre><code>This is text that _should_ remain\nthe **same** even with inline stuff\n</code></pre></div>",
         )
+
+    def test_extract_title(self):
+        md = """
+# Title
+
+This is a paragraph.
+"""
+
+        title = extract_title(md)
+        self.assertEqual(title, "Title")
+
+    def test_extract_title_not_first(self):
+        md = """
+This is a paragraph.
+
+# Not first line title
+"""
+
+        title = extract_title(md)
+        self.assertEqual(title, "Not first line title")
+
+
+    def test_extract_title_no_title(self):
+        md = """
+There is no title in this text
+
+Will it raise the appropriate exception?
+"""
+
+        with self.assertRaises(Exception):
+            extract_title(md)

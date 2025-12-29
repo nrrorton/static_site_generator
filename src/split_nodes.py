@@ -147,7 +147,7 @@ def markdown_to_html_node(markdown):
         block_type = block_to_block_type(block)
 
         if block_type == BlockType.HEADING:
-            num_hash = count_char(block.text)
+            num_hash = count_char(block)
             text = block[num_hash+1:]
             html_nodes = text_to_children(text)
             parent = ParentNode(f"h{num_hash}", html_nodes)
@@ -162,7 +162,7 @@ def markdown_to_html_node(markdown):
             parent_list.append(parents)
 
         if block_type == BlockType.QUOTE:
-            cleand_lines = []
+            cleaned_lines = []
             for line in lines:
                 cleaned_lines.append(line[1:].strip())
             text = " ".join(cleaned_lines)
@@ -183,7 +183,7 @@ def markdown_to_html_node(markdown):
             list_items = []
             for line in lines:
                 position = line.find(' ')
-                item_text = line[position + 2:]
+                item_text = line[position + 1:]
                 item_children = text_to_children(item_text)
                 list_items.append(ParentNode("li", item_children))
             final_list_parent = ParentNode("ol", list_items)
@@ -197,3 +197,16 @@ def markdown_to_html_node(markdown):
             parent_list.append(parent)
 
     return ParentNode("div", parent_list)
+
+
+def extract_title(markdown):
+    blocks = markdown_to_blocks(markdown)
+
+    for block in blocks:
+        block = block.strip()
+        if block.startswith('# '):
+            return block[2:].strip()
+
+    raise Exception("No title found")
+    
+
