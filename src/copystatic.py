@@ -1,5 +1,6 @@
 import os
 import shutil
+from main import *
 from split_nodes import *
 from htmlnode import *
 
@@ -25,7 +26,7 @@ def copy_source_to_destination(src, dst):
             copy_source_to_destination(src_item, dst_item)
     
 
-def generate_page(from_path, template_path, dest_path):
+def generate_page(from_path, template_path, dest_path, basepath):
     print(f"Generating page from {from_path} to {dest_path} using {template_path}")
 
     with open(from_path) as f:
@@ -39,11 +40,30 @@ def generate_page(from_path, template_path, dest_path):
     page_with_title = tmp.replace("{{ Title }}", title)
     final_html = page_with_title.replace("{{ Content }}", html_string)
 
+    final_html = final_html.replace('href="/', f'href="{basepath}')
+    final_html = final_html.replace('src="/', f'src="{basepath}')
+
     dirpath = os.path.dirname(dest_path)
     if dirpath != "":
         os.makedirs(dirpath, exist_ok=True)
 
     with open(dest_path, "w") as d:
         d.write(final_html)
-    
+
+
+def generate_pages_recursive(dir_path_content, template_path, dest_dir_path, basepath):
+    dir_files = os.listdir(dir_path_content)
+    for file in dir_files:
+        content_item_path = os.path.join(dir_path_content, file)
+        
+        if file.endswith('.md'):
+            name_no_ext = file[:-3]
+            html_filename = name_no_ext + '.html'
+            public_item_path = os.path.join(dest_dir_path, html_filename)
+            generate_page(content_item_path, template_path, public_item_path, basepath)
+            
+        elif os.path.isdir(content_item_path):
+            public_dir_path = os.path.join(dest_dir_path, file)
+            generate_pages_recursive(content_item_path, template_path, public_dir_path, basepath)
+            
     
